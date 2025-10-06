@@ -53,6 +53,9 @@ This project deploys Azure infrastructure using Bicep templates for a demo setup
 3. **Get AKS credentials (optional)**
    ```bash
    make get-aks-creds
+   # This creates <cluster-name>.kubeconfig file
+   # Use with: kubectl --kubeconfig=<cluster-name>.kubeconfig get nodes
+   # Or export: export KUBECONFIG=<cluster-name>.kubeconfig
    ```
 
 ### Available Make Targets
@@ -61,7 +64,7 @@ This project deploys Azure infrastructure using Bicep templates for a demo setup
 - `make validate` - Validate Bicep templates
 - `make what-if` - Preview deployment changes
 - `make status` - Show deployment status and outputs
-- `make get-aks-creds` - Configure kubectl with AKS credentials
+- `make get-aks-creds` - Download AKS credentials to `<cluster-name>.kubeconfig`
 - `make show-vars` - Show variables extracted from bicepparam file
 - `make cleanup` - Delete all resources (with confirmation)
 - `make force-cleanup` - Delete all resources (no confirmation)

@@ -20,7 +20,7 @@ help:
 	@echo "  status     - Show deployment status and outputs"
 	@echo "  what-if    - Preview what changes will be made"
 	@echo "  show-vars  - Show variables extracted from bicepparam file"
-	@echo "  get-aks-creds - Configure kubectl with AKS credentials"
+	@echo "  get-aks-creds - Download AKS credentials to <cluster-name>.kubeconfig"
 	@echo "  help       - Show this help message"
 
 # Show extracted variables from bicepparam file
@@ -89,8 +89,10 @@ get-aks-creds:
 	@echo "Getting AKS credentials..."
 	@AKS_NAME=$$(az aks list --resource-group $(RG_NAME) --query "[0].name" -o tsv); \
 	if [ -n "$$AKS_NAME" ]; then \
-		az aks get-credentials --resource-group $(RG_NAME) --name $$AKS_NAME --overwrite-existing; \
-		echo "AKS credentials configured. Test with: kubectl get nodes"; \
+		az aks get-credentials --resource-group $(RG_NAME) --name $$AKS_NAME --file "$$AKS_NAME.kubeconfig" --overwrite-existing; \
+		echo "AKS credentials saved to: $$AKS_NAME.kubeconfig"; \
+		echo "Use with: kubectl --kubeconfig=$$AKS_NAME.kubeconfig get nodes"; \
+		echo "Or export: export KUBECONFIG=$$AKS_NAME.kubeconfig"; \
 	else \
 		echo "No AKS cluster found in resource group $(RG_NAME)"; \
 	fi

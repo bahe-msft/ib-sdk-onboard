@@ -1,1 +1,4 @@
 .claude/*.local.json
+
+# Kubernetes config files
+*.kubeconfig
