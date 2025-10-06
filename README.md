@@ -17,11 +17,17 @@ This project deploys Azure infrastructure using Bicep templates for a demo setup
 ├── main.bicep
 ├── main.bicepparam
 ├── Makefile
+├── k8s-app/                     # Kubernetes test applications
+│   ├── deploy.sh               # Deployment script
+│   ├── manifests/
+│   │   └── demo-app.yaml       # Templated K8s manifest
+│   └── README.md               # K8s application documentation
 └── modules/
     ├── acr.bicep
     ├── keyvault.bicep
     ├── managed-identity.bicep
-    └── aks.bicep
+    ├── aks.bicep
+    └── aks-ib.bicep
 ```
 
 ## Key Integrations
@@ -79,6 +85,27 @@ az deployment sub create \
   --template-file main.bicep \
   --parameters main.bicepparam
 ```
+
+## Testing the Infrastructure
+
+After deployment, test the identity binding functionality:
+
+1. **Deploy test application**
+   ```bash
+   cd k8s-app
+   ./deploy.sh
+   ```
+
+2. **Test different SDK implementations**
+   ```bash
+   ./deploy.sh go-sdk-test ghcr.io/example/go-sdk:latest
+   ./deploy.sh python-sdk-test ghcr.io/example/python-sdk:latest
+   ```
+
+3. **Monitor application logs**
+   ```bash
+   kubectl --kubeconfig=<cluster-name>.kubeconfig logs -n demo-app-ib -l app=demo-app-ib -f
+   ```
 
 ## Cleanup
 

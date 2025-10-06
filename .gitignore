@@ -2,3 +2,7 @@
 
 # Kubernetes config files
 *.kubeconfig
+
+# Temporary manifest files
+k8s-app/manifests/*.tmp
+k8s-app/manifests/*-rendered.yaml
