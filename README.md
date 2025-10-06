@@ -17,6 +17,12 @@ This project deploys Azure infrastructure using Bicep templates for a demo setup
 ├── main.bicep
 ├── main.bicepparam
 ├── Makefile
+├── demo-apps/                   # SDK demo applications
+│   └── go/                     # Go SDK implementation
+│       ├── Dockerfile          # Multi-stage container build
+│       ├── go.mod             # Go dependencies
+│       ├── go.sum             # Dependency checksums
+│       └── main.go            # Go application with workload identity
 ├── k8s-app/                     # Kubernetes test applications
 │   ├── deploy.sh               # Deployment script
 │   ├── manifests/
