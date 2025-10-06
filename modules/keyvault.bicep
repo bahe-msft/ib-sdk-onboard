@@ -33,7 +33,17 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   }
 }
 
+// Sample secret
+resource sampleSecret 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  name: 'sample-secret-key'
+  parent: keyVault
+  properties: {
+    value: 'hello from akv'
+  }
+}
+
 // Outputs
 output keyVaultName string = keyVault.name
 output keyVaultId string = keyVault.id
 output keyVaultUri string = keyVault.properties.vaultUri
+output sampleSecretName string = sampleSecret.name

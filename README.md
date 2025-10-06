@@ -28,6 +28,7 @@ This project deploys Azure infrastructure using Bicep templates for a demo setup
 
 - AKS cluster configured to pull images from ACR
 - Managed Identity granted Key Vault secret access
+- Pre-configured sample secret (`sample-secret-key` = `hello from akv`) for testing
 - All resources deployed in single Resource Group
 
 ## Deployment Steps
@@ -49,9 +50,9 @@ This project deploys Azure infrastructure using Bicep templates for a demo setup
    make deploy
    ```
 
-3. **Test the deployment**
+3. **Get AKS credentials (optional)**
    ```bash
-   make test
+   make get-aks-creds
    ```
 
 ### Available Make Targets
@@ -61,7 +62,6 @@ This project deploys Azure infrastructure using Bicep templates for a demo setup
 - `make what-if` - Preview deployment changes
 - `make status` - Show deployment status and outputs
 - `make get-aks-creds` - Configure kubectl with AKS credentials
-- `make test` - Test infrastructure connectivity
 - `make show-vars` - Show variables extracted from bicepparam file
 - `make cleanup` - Delete all resources (with confirmation)
 - `make force-cleanup` - Delete all resources (no confirmation)

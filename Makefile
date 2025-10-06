@@ -20,6 +20,7 @@ help:
 	@echo "  status     - Show deployment status and outputs"
 	@echo "  what-if    - Preview what changes will be made"
 	@echo "  show-vars  - Show variables extracted from bicepparam file"
+	@echo "  get-aks-creds - Configure kubectl with AKS credentials"
 	@echo "  help       - Show this help message"
 
 # Show extracted variables from bicepparam file
@@ -94,20 +95,6 @@ get-aks-creds:
 		echo "No AKS cluster found in resource group $(RG_NAME)"; \
 	fi
 
-# Test connectivity
-.PHONY: test
-test: get-aks-creds
-	@echo "Testing infrastructure..."
-	@echo "Testing Kubernetes cluster connectivity..."
-	kubectl get nodes || echo "Failed to connect to AKS cluster"
-	@echo ""
-	@echo "Listing Key Vault secrets (should be empty initially)..."
-	@AKV_NAME=$$(az keyvault list --resource-group $(RG_NAME) --query "[0].name" -o tsv); \
-	if [ -n "$$AKV_NAME" ]; then \
-		az keyvault secret list --vault-name $$AKV_NAME --output table; \
-	else \
-		echo "No Key Vault found"; \
-	fi
 
 # Clean up all resources
 .PHONY: cleanup

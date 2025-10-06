@@ -67,11 +67,25 @@ module aks 'modules/aks.bicep' = {
   ]
 }
 
+module aksMIIdentityBinding 'modules/aks-ib.bicep' = {
+  scope: resourceGroup
+  name: 'aksIdentityBindingDeployment'
+  params: {
+    aksName: aksName
+    miName: managedIdentityName
+  }
+  dependsOn: [
+    managedIdentity
+    aks
+  ]
+}
+
 // Outputs
 output resourceGroupName string = resourceGroup.name
 output acrName string = acr.outputs.acrName
 output acrLoginServer string = acr.outputs.loginServer
 output keyVaultName string = keyVault.outputs.keyVaultName
+output sampleSecretName string = keyVault.outputs.sampleSecretName
 output aksName string = aks.outputs.aksName
 output managedIdentityName string = managedIdentity.outputs.name
 output managedIdentityClientId string = managedIdentity.outputs.clientId
