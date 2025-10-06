@@ -42,6 +42,14 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-06-02-preview' = {
       networkPlugin: 'kubenet'
       loadBalancerSku: 'standard'
     }
+    oidcIssuerProfile: {
+      enabled: true
+    }
+    securityProfile: {
+      workloadIdentity: {
+        enabled: true
+      }
+    }
   }
 }
 
