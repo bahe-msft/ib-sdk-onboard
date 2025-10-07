@@ -92,29 +92,45 @@ az deployment sub create \
   --parameters main.bicepparam
 ```
 
-## Testing the Infrastructure
+## Testing SDK
+
+### Building Application Images
+
+For each SDK implementation, build and push the Docker image to ACR. Sample using Go SDK:
+
+```bash
+cd demo-apps/go
+az acr login --name <acr-name>
+docker build -t <acr-name>.azurecr.io/sdktest/<language>:latest .
+docker push <acr-name>.azurecr.io/sdktest/<language>:latest
+```
+
+### Deploying Application
 
 After deployment, test the identity binding functionality:
 
 1. **Deploy test application**
    ```bash
    cd k8s-app
-   ./deploy.sh
+   ./deploy.sh <language> <image>
    ```
 
-2. **Test different SDK implementations**
+2. **Monitor application logs**
    ```bash
-   ./deploy.sh go-sdk-test ghcr.io/example/go-sdk:latest
-   ./deploy.sh python-sdk-test ghcr.io/example/python-sdk:latest
+   kubectl --kubeconfig=<cluster-name>.kubeconfig logs -n demo-app-ib -l app=<language> -f
    ```
 
-3. **Monitor application logs**
-   ```bash
-   kubectl --kubeconfig=<cluster-name>.kubeconfig logs -n demo-app-ib -l app=demo-app-ib -f
-   ```
-
-## Cleanup
-
-```bash
-make cleanup
+Expected to see logs as follows:
+```
+2025/10/07 03:42:26 Secret Value: hello from akv
+2025/10/07 03:42:32 Secret Value: hello from akv
+2025/10/07 03:42:37 Secret Value: hello from akv
+2025/10/07 03:42:42 Secret Value: hello from akv
+2025/10/07 03:42:47 Secret Value: hello from akv
+2025/10/07 03:42:53 Secret Value: hello from akv
+2025/10/07 03:42:58 Secret Value: hello from akv
+2025/10/07 03:43:03 Secret Value: hello from akv
+2025/10/07 03:43:08 Secret Value: hello from akv
+2025/10/07 03:43:14 Secret Value: hello from akv
+2025/10/07 03:43:19 Secret Value: hello from akv
 ```
