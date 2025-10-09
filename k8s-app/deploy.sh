@@ -27,29 +27,35 @@ echo "Extracting deployment variables..."
 # Get resource group name from bicepparam
 RG_NAME=$(grep "param resourceGroupName" "$PROJECT_ROOT/main.bicepparam" | sed "s/param resourceGroupName = '\(.*\)'/\1/")
 
-# Get deployment outputs
-DEPLOYMENT_NAME=$(az deployment sub list --query "[?contains(name, 'azure-infra-demo')].name | [0]" -o tsv)
-if [ -z "$DEPLOYMENT_NAME" ]; then
-    echo "Error: No deployment found. Please run 'make deploy' first."
-    exit 1
-fi
+# Get resources directly from resource group
+echo "Querying resources from resource group: $RG_NAME"
 
-echo "Using deployment: $DEPLOYMENT_NAME"
+# Get Managed Identity Client ID
+MANAGED_IDENTITY_CLIENT_ID=$(az identity list --resource-group "$RG_NAME" --query "[0].clientId" -o tsv)
 
-# Extract outputs from deployment
-MANAGED_IDENTITY_CLIENT_ID=$(az deployment sub show --name "$DEPLOYMENT_NAME" --query "properties.outputs.managedIdentityClientId.value" -o tsv)
-KEYVAULT_NAME=$(az deployment sub show --name "$DEPLOYMENT_NAME" --query "properties.outputs.keyVaultName.value" -o tsv)
-AKS_NAME=$(az deployment sub show --name "$DEPLOYMENT_NAME" --query "properties.outputs.aksName.value" -o tsv)
+# Get Key Vault name
+KEYVAULT_NAME=$(az keyvault list --resource-group "$RG_NAME" --query "[0].name" -o tsv)
+
+# Get AKS cluster name
+AKS_NAME=$(az aks list --resource-group "$RG_NAME" --query "[0].name" -o tsv)
 
 # Construct Key Vault URL
 KEYVAULT_URL="https://${KEYVAULT_NAME}.vault.azure.net"
 
 # Validate required variables
-if [ -z "$MANAGED_IDENTITY_CLIENT_ID" ] || [ -z "$KEYVAULT_URL" ] || [ -z "$AKS_NAME" ]; then
-    echo "Error: Failed to extract required deployment outputs."
-    echo "MANAGED_IDENTITY_CLIENT_ID: $MANAGED_IDENTITY_CLIENT_ID"
-    echo "KEYVAULT_URL: $KEYVAULT_URL"
-    echo "AKS_NAME: $AKS_NAME"
+if [ -z "$RG_NAME" ]; then
+    echo "Error: Failed to extract resource group name from bicepparam file."
+    exit 1
+fi
+
+if [ -z "$MANAGED_IDENTITY_CLIENT_ID" ] || [ -z "$KEYVAULT_NAME" ] || [ -z "$AKS_NAME" ]; then
+    echo "Error: Failed to find required resources in resource group '$RG_NAME'."
+    echo "Make sure the resource group contains exactly one instance of each:"
+    echo "  - Managed Identity (found: $([ -n "$MANAGED_IDENTITY_CLIENT_ID" ] && echo "✓" || echo "✗"))"
+    echo "  - Key Vault (found: $([ -n "$KEYVAULT_NAME" ] && echo "✓" || echo "✗"))"
+    echo "  - AKS Cluster (found: $([ -n "$AKS_NAME" ] && echo "✓" || echo "✗"))"
+    echo ""
+    echo "Please run 'make deploy' first to create the required resources."
     exit 1
 fi
 
