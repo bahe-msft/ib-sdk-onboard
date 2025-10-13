@@ -1,11 +1,11 @@
 # Stage 1: Download dependencies
-FROM golang:1.24 AS deps
+FROM golang:1.24.6 AS deps
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
 # Stage 2: Build application
-FROM golang:1.24 AS builder
+FROM golang:1.24.6 AS builder
 WORKDIR /app
 # Copy downloaded dependencies from deps stage
 COPY --from=deps /go/pkg /go/pkg
